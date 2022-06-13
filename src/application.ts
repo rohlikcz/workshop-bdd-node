@@ -1,6 +1,7 @@
 import { DataSource, Repository } from "typeorm"
 import { SnakeNamingStrategy } from "typeorm-naming-strategies"
 import CartDiscountAdder from "./application/CartDiscountAdder"
+import CartFetcher from "./application/CartFetcher"
 import CartLineAdder from "./application/CartlineAdder"
 import Server from "./config/Server"
 import CartController from "./controller/CartController"
@@ -26,7 +27,8 @@ const productRepository: Repository<Product> = connection.getRepository(Product)
 const discountRepository: Repository<Discount> = connection.getRepository(Discount)
 const cartLineAdder: CartLineAdder = new CartLineAdder(cartRepository, productRepository)
 const cartDiscountAdder: CartDiscountAdder = new CartDiscountAdder(cartRepository, discountRepository)
-const cartController = new CartController(cartLineAdder, cartDiscountAdder)
+const cartFetcher: CartFetcher = new CartFetcher(cartRepository)
+const cartController = new CartController(cartLineAdder, cartDiscountAdder, cartFetcher)
 const server: Server = new Server(process.env.WEB_PORT, [cartController])
 
 connection.initialize()
