@@ -15,20 +15,9 @@ class CartDiscountAdder {
         const cart: Cart = await this.cartRepository.findOneByOrFail({id: cartId})
         const discount: Discount = await this.discountRepository.findOneByOrFail({code: code})
 
-        this.applyDiscount(cart, discount)
+        cart.applyDiscount(discount)
 
         await this.cartRepository.save(cart)
-    }
-
-    private applyDiscount(cart: Cart, discount: Discount): void {
-        //@todo suspicious code - should we move this logic to cart entity?
-        const foundDiscount: Discount|undefined = cart.discounts.find((currentDiscount: Discount) => currentDiscount.id == discount.id)
-        
-        if (foundDiscount) {
-            throw "Discount already applied"
-        }
-
-        cart.discounts.push(discount)
     }
 }
 

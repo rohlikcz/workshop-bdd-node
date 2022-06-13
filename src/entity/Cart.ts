@@ -62,12 +62,30 @@ class Cart {
     }
 
     public totalPrice(): number {
-        return Math.round((this.totalLinesPrice() - this.totalDiscountsPrice()) * 100) / 100
+        return Math.max(
+            0,
+            Math.round((this.totalLinesPrice() - this.totalDiscountsPrice()) * 100) / 100
+        )
     }
 
     public quantityOfProduct(sku: string): number {
         const cartLine: CartLine|undefined = this.lines.find((cartLine: CartLine) => cartLine.product.sku == sku)
         return cartLine ? cartLine.quantity : 0
+    }
+
+    public hasDiscount(name: string): boolean {
+        const discount: Discount|undefined = this.discounts.find((discount: Discount) => discount.name == name)
+        return discount ? true : false
+    }
+
+    public applyDiscount(discount: Discount): void {
+        const foundDiscount: Discount|undefined = this.discounts.find((currentDiscount: Discount) => currentDiscount.id == discount.id)
+
+        if (foundDiscount) {
+            throw "Discount already applied"
+        }
+
+        this.discounts.push(discount)
     }
 }
 

@@ -63,6 +63,30 @@ class CartSteps {
         assert.equal(cart.quantityOfProduct(sku), 0)
     }
 
+    @then("there should be discount {string} in my cart")
+    public async thereShouldBeDiscountInCart(name: string) {
+        const cart: Cart = await this.currentCart()
+        assert.equal(cart.hasDiscount(name), true, `Discount ${name} should be present`)
+    }
+
+    @then("there shouldn't be discounts in my cart")
+    public async thereShouldNotBeDiscountsInCart() {
+        const cart: Cart = await this.currentCart()
+        assert.equal(0, cart.discounts.length);
+    }
+
+    @when("I apply {string} discount to my cart")
+    public async iApplyDiscountToMyCart(code: string) {
+        await this.axios.post(
+            `http://${process.env.WEB_HOST}:${process.env.WEB_PORT}/carts/${this.currentCartId}/discounts`,
+            { code: code },
+            {
+                headers: {'Content-Type': 'application/json'},
+                validateStatus: (status: number) => { return true }
+            }
+        )
+    }
+
     private currentCart(): Promise<Cart> {
         return this.cartRepository.findOneByOrFail({id: this.currentCartId})
     }
