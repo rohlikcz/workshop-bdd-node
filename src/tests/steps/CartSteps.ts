@@ -5,6 +5,7 @@ import Cart from "../../entity/Cart"
 import axios, { Axios } from 'axios'
 import assert from "assert"
 import CartLine from "../../entity/CartLine"
+import Discount from "../../entity/Discount"
 
 @binding()
 class CartSteps {
@@ -43,17 +44,29 @@ class CartSteps {
 
     @when("I remove product {string} of my cart")
     public async removeProductOfMyCart(sku: string): Promise<void> {
-        throw "Step method not implemented"
+        await this.addProductUnitsToMyCart(0, sku)
     }
 
     @then("the cart's total cost should be {double} euro(s)")
     public async cartTotalCost(totalCost: number) {
-        throw "Step method not implemented"
+        const cart: Cart = await this.currentCart()
+        const totalProducts: number = cart
+            .lines
+            .map((cartLine: CartLine) => cartLine.quantity * cartLine.product.price)
+            .reduce((carry: number, current: number) => carry + current, 0)
+        const totalDiscounts = cart
+            .discounts
+            .map((discount: Discount) => discount.value)
+            .reduce((carry: number, current: number) => carry + current, 0)
+        assert.equal(Math.round((totalProducts - totalDiscounts) * 100) / 100, totalCost)
     }
 
     @then("there should be {int} unit(s) of product {string} in my cart")
     public async thereShouldBeProductUnitsInMyCart(quantity: number, sku: string) {
-        throw "Step method not implemented"
+        const cart: Cart = await this.currentCart()
+        const cartLine: CartLine|undefined = cart.lines.find((cartLine: CartLine) => cartLine.product.sku == sku)
+        assert.equal(cartLine ? true : false, true, `Product ${sku} not found`)
+        assert.equal(cartLine?.quantity, quantity)
     }
 
     @then("there shouldn't be product {string} in my cart")
