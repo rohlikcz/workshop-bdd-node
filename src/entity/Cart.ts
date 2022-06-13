@@ -55,16 +55,17 @@ class Cart {
             .reduce((carry: number, current: number) => carry + current, 0)
     }
 
-    private totalDiscountsPrice(): number {
+    private totalDiscountsPercentage(): number {
         return this.discounts
             .map((discount: Discount) => discount.value)
             .reduce((carry: number, current: number) => carry + current, 0)
     }
 
     public totalPrice(): number {
+        const totalLinesPrice: number = this.totalLinesPrice()
         return Math.max(
             0,
-            Math.round((this.totalLinesPrice() - this.totalDiscountsPrice()) * 100) / 100
+            Math.round((totalLinesPrice - (totalLinesPrice * this.totalDiscountsPercentage() / 100)) * 100) / 100
         )
     }
 
