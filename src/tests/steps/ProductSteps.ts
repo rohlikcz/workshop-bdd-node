@@ -14,7 +14,13 @@ class ProductSteps {
 
     @given("the following products exist:")
     public async theFollowingProductsExists(table: DataTable): Promise<void> { 
-        throw "Step method not implemented"
+        table.hashes().forEach(async (row: any) => {
+            const product = new Product()
+            product.sku = row.sku
+            product.name = row.name
+            product.price = row.price
+            await this.productRepository.save(product)
+        })
     }
 }
 
